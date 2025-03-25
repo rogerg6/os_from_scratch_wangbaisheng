@@ -1,19 +1,21 @@
+# 显示设置操作数的段寄存器
+# kvmtool默认会把代码加载到段基址0x1000的地方运行
 .text
-.code16
+.code16   # 编译为16bit的程序
 start:
   mov $0x1010, %bx
   mov %bx, %es
 
-  mov $0x3f8, %dx
+  mov $0x3f8, %dx       # dx=0x3f8, 3f8是串口0的地址
 
-  mov 0x100, %al
+  mov 0x100, %al        # CS:0x100=0x1000:0x100=0x1000<<4 + 0x100=0x10100, 把地址0x10100处的byte赋值给al，最后al=0x41
   out %al, %dx
 
-  mov %es:0x100, %al
+  mov %es:0x100, %al    # 0x1010:0x100=0x1010<<4 + 0x100=0x10200, 把地址0x10200处的byte赋值给al，最后al=0x42
   out %al, %dx
   hlt
 
-.org 0x100
+.org 0x100              # 编译后位于代码开始偏移为0x100的地方, 存放的是一个byte，为0x41
   .byte 0x41
 .org 0x200
   .byte 0x42

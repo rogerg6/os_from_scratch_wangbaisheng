@@ -232,7 +232,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
 
 	switch (offset) {
 	case UART_TX:
-    fprintf(stderr, "output: %lx\n", *((unsigned long*)data));
+    fprintf(stderr, "output: 0x%lx\n", *((unsigned long*)data));
     fprintf(stderr, "%s\n", ((char*)data));
 
 		if (dev->lcr & UART_LCR_DLAB) {
