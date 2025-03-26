@@ -12,7 +12,8 @@ sum:
 1:
     add %bx, %ax
     inc %bx
-    cmp $10, %bx
+    #cmp 4(%bp), %bx         # 比较主调函数传入的参数
+    cmp %di, %bx
     jbe 1b
 
     mov %bp, %sp            # sp += 8, 释放被调函数栈空间
