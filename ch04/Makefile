@@ -1,5 +1,6 @@
 
-all: hello addr_immd addr_disp addr_modrm addr_sib addr_sib_disp stack
+all: hello addr_immd addr_disp addr_modrm addr_sib addr_sib_disp stack \
+func
 
 hello:
 	as hello_use_segmentreg.s -o hello.o
@@ -35,6 +36,11 @@ stack:
 	as stack.s -o stack.o
 	ld -Ttext=0 stack.o -o stack.elf
 	objcopy -O binary stack.elf stack.bin
+
+func:
+	as function.s -o func.o
+	ld -Ttext=0 func.o -o func.elf
+	objcopy -O binary func.elf func.bin
 
 dump:
 	objdump -d -m i8086 hello.elf
