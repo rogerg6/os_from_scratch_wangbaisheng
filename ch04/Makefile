@@ -39,7 +39,8 @@ stack:
 
 func:
 	as function.s -o func.o
-	ld -Ttext=0 func.o -o func.elf
+	as sum.s -o sum.o
+	ld -Ttext=0 func.o sum.o -o func.elf
 	objcopy -O binary func.elf func.bin
 
 dump:
