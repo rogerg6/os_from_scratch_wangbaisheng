@@ -2,3 +2,4 @@
 *.elf
 *.o
 ch05/sum
+os/build
