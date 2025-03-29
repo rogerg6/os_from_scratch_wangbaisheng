@@ -1,4 +1,4 @@
-kernel.bin: build boot16.bin boot32.bin
+kernel.bin: build boot16.bin boot32.bin system.bin
 	./build
 
 boot16.bin: boot16.S
@@ -10,6 +10,11 @@ boot32.bin: boot32.S
 	gcc -c boot32.S -o boot32.o
 	ld -Ttext=0x20000 boot32.o -o boot32.elf
 	objcopy -O binary boot32.elf boot32.bin
+
+system.bin: head64.S
+	gcc -c head64.S -o head64.o
+	ld -Ttext=0xffffffff80100000 head64.o -o system.elf
+	objcopy -O binary system.elf system.bin
 
 build: build.c
 	gcc $< -o $@

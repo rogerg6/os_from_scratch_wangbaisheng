@@ -16,6 +16,10 @@ start32:
     # 设置数据段寄存器
     mov $0x10, %ax
     mov %ax, %ds
+    mov %ax, %es                # 初始化各个段寄存器
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %ax, %ss
 
     lgdt gdtr
 
@@ -25,7 +29,7 @@ start32:
 1:
     stosl                       # (es:edi)=eax； edi+=4
     add $0x1000, %eax
-    add $0x4, %edi
+    add $4, %edi
     cmp $(0x32000 + 32 * 8), %edi
     jl 1b
 
@@ -35,9 +39,35 @@ start32:
 2:
     stosl                       # (es:edi)=eax； edi+=4
     add $0x1000, %eax
-    add $0x4, %edi
+    add $4, %edi
     cmp $(0x32000 + 512 * 32 * 8), %edi
     jl 2b
+
+    ##### 切换到64位模式 #####
+    # 1. 设置CR4 PAE位，使能x86物理地址扩展功能
+    mov %cr4, %eax
+    btsl $5, %eax               # bts(bit set)可单独置位寄存器某一位
+    movl %eax, %cr4
+
+    # 2. 设置CR3指向页表
+    movl $0x30000, %eax
+    movl %eax, %cr3
+
+    # 3. 使能64位模式
+    movl $0xc0000080, %ecx
+    rdmsr
+    bts $8, %eax            # 使能64位模式。使能并不代表进入64位模式!!!! 在开启分页后，cpu才会自动进入64位模式
+    bts $0, %eax            # 使能syscall指令
+    wrmsr
+
+    # 4. 开启分页。激活64位模式
+    mov %cr0, %eax
+    bts $31, %eax
+    mov %eax, %cr0
+
+    ##### 跳转到head64.S #####
+    ljmp $0x8, $0x100000
+
 
     hlt
 
@@ -54,12 +84,12 @@ gdtr:
 # 4级页表
 .org 0x10000
     .quad 0x0000000000053003         # 恒等映射4级页表项
-    .fill 511, 8, 0
+    .fill 510, 8, 0
     .quad 0x0000000000031003
 
 # 3级页表
 .org 0x11000
-    .fill 509, 8, 0
+    .fill 510, 8, 0
     .quad 0x0000000000032003
     .fill 1, 8, 0
 
