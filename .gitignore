@@ -3,3 +3,6 @@
 *.o
 ch05/sum
 os/build
+.clangd
+.depend
+compile_commands.json

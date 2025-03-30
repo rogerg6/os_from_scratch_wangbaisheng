@@ -1,4 +1,5 @@
 
+extern void mm_init(void);
 
 int main(void) {
     __asm__(
@@ -6,5 +7,6 @@ int main(void) {
         "mov $'M', %ax\n\t"
         "out %ax, %dx\n"
     );
+    mm_init();
     __asm__("hlt");
 }

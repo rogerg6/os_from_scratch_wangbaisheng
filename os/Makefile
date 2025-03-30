@@ -11,21 +11,31 @@ boot32.bin: boot32.S
 	ld -Ttext=0x20000 boot32.o -o boot32.elf
 	objcopy -O binary boot32.elf boot32.bin
 
-system.bin: head64.o main.o
+system.bin: head64.o main.o mm/memory.o
+	gcc -c head64.S -o head64.o 
 	ld -Ttext=0xffffffff80100000 $^ -o system.elf
 	objcopy -O binary system.elf system.bin
 
-head64.o: head64.S
-	gcc -c $< -o $@
-
 CFLAGS = -std=c11 -I. -fno-pic -mcmodel=kernel -fno-stack-protector -fcf-protection=none
 
-SRCS = main.c
+SRCS = main.c $(wildcard mm/*.c)
+
+# 创建源文件的依赖关系
+.depend: $(SRCS)
+	@rm -f .depend
+	@$(foreach src, $(SRCS), \
+		echo -n $(dir $(src)) >> .depend; \
+		gcc -I. -MM $(src) >> .depend; \
+	)
+include .depend
 
 OBJS = $(SRCS:.c=.o)
 
 build: build.c
 	gcc $< -o $@
+
+compiledb:
+	compiledb -nf -o ../compile_commands.json make
 
 .PHONY: clean run
 

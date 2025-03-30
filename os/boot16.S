@@ -3,7 +3,23 @@
 .code16
 
 .start16:
-    # 实模式
+    ##### 实模式 #####
+    
+    # 调用BIOS中断，获取内存信息
+    # 存放在0x13000处
+    mov $e820_entry, %di
+    xor %ebx, %ebx
+e820_read_entry:
+    mov $0xe820, %eax
+    mov $20, %ecx
+    int $0x15
+
+    incb e820_nr_entry
+    add  $20, %di
+
+    cmp $0, %ebx
+    jne e820_read_entry
+
     lgdt gdtr               # 告知cpu段描述符地址
 
     # 切换cpu到保护模式
@@ -26,3 +42,9 @@ gdt_end:
 gdtr:
     .word gdt_end - gdt
     .word gdt, 0x1
+
+.org 0x3000
+e820_nr_entry:
+    .long 0
+e820_entry:
+    .fill 1024, 1, 0
