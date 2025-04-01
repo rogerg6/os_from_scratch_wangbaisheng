@@ -1,5 +1,5 @@
+#include "include/mm.h"
 
-extern void mm_init(void);
 
 int main(void) {
     __asm__(
@@ -8,5 +8,10 @@ int main(void) {
         "out %ax, %dx\n"
     );
     mm_init();
+
+    unsigned long *x = VA(200 * 1024 * 1024);
+    *x = 5;
+    print(*x);
+
     __asm__("hlt");
 }
