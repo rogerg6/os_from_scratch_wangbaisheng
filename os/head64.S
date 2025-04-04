@@ -2,6 +2,8 @@
 
 .text
 .code64
+.globl gdt
+.globl ret_from_kernel
 
 start64:
     # 64位模式
@@ -47,3 +49,11 @@ gdtr:
 // 4KB stack
 .fill 4096, 1, 0
 task0_stack:
+
+ret_from_kernel:
+    mov $USER_DS, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    iretq                   # 弹出内核栈中的cs,ip,ss,rsp, 运行用户态程序

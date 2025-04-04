@@ -1,4 +1,4 @@
-kernel.bin: build boot16.bin boot32.bin system.bin
+kernel.bin: build boot16.bin boot32.bin system.bin app/app1.bin
 	./build
 
 boot16.bin: boot16.S
@@ -14,7 +14,7 @@ boot32.bin: boot32.S
 CFLAGS = -std=c11 -I. -fno-pic -mcmodel=kernel -fno-stack-protector -fcf-protection=none \
 	-nostdinc -fno-builtin
 
-SRCS = main.c $(wildcard mm/*.c) $(wildcard lib/*.c)
+SRCS = main.c $(wildcard mm/*.c) $(wildcard lib/*.c) $(wildcard sched/*.c) $(wildcard kernel/*.c)
 
 # 创建源文件的依赖关系
 .depend: $(SRCS)
@@ -31,6 +31,11 @@ system.bin: head64.o $(OBJS)
 	gcc -c head64.S -o head64.o 
 	ld -Ttext=0xffffffff80100000 $^ -o system.elf
 	objcopy -O binary system.elf system.bin
+
+app/app1.bin: app/app1.S
+	gcc -c app/app1.S -o app/app1.o
+	ld -Ttext=0x100000 app/app1.o -o app/app1.elf
+	objcopy -O binary app/app1.elf app/app1.bin
 
 build: build.c
 	gcc $< -o $@

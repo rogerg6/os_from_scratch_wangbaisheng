@@ -26,6 +26,7 @@
 #define BOOT16_START_ADDR   0x10000          // boot16.bin加载物理地址
 #define BOOT32_START_ADDR   0x20000          // boot32.bin加载物理地址
 #define SYSTEM_START_ADDR   0x100000         //system.bin加载物理地址
+#define APP1_START_ADDR     0xc800000        // app1 加载物理地址
 
 int main(void) {
     int fd_out;
@@ -77,6 +78,23 @@ int main(void) {
     fd = open("system.bin", O_RDONLY);
     if (fd < 0) {
         fprintf(stderr, "open system.bin failed.\n");
+        return -3;
+    }
+    while (1) {
+        c = read(fd, buf, 512);
+        if (c > 0)
+            write(fd_out, buf, c);
+        else
+            break;
+    }
+    close(fd);
+
+    lseek(fd_out, APP1_START_ADDR - BOOT16_START_ADDR, SEEK_SET);
+
+    // read app1
+    fd = open("app/app1.bin", O_RDONLY);
+    if (fd < 0) {
+        fprintf(stderr, "open app/app1.bin failed.\n");
         return -3;
     }
     while (1) {

@@ -23,7 +23,12 @@ struct e820map {
 
 extern unsigned long mem_size;
 extern uint8_t pages[MAX_PAGES];
+
+void mm_init(void);
 unsigned long alloc_page(void);
 void free_page(unsigned long addr);
 
-void mm_init(void);
+void map_range(unsigned long pml4_pa, unsigned long from_va, unsigned long to_pa, char us, long npage);
+
+void *malloc(int size);
+void free(void *obj);
