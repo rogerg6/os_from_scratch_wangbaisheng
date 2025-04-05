@@ -11,6 +11,8 @@ start64:
     mov $'L', %al
     out %al, %dx
 
+    lidt idtr
+
     lgdt gdtr
 
     # 初始化段寄存器
@@ -45,6 +47,9 @@ gdtr:
     .word gdt_end - gdt
     .quad gdt           # 段基址是0，gdt地址就是gdt
 
+idtr:
+    .word 16 * 256
+    .quad idt_table
 
 // 4KB stack
 .fill 4096, 1, 0
