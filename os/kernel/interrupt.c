@@ -1,12 +1,17 @@
 
 
 #include "include/types.h"
+#include "include/print.h"
 #include "include/string.h"
 #include "include/segment.h"
+#include "include/sched.h"
+#include "include/interrupt.h"
 
 
 #define GATE_INTERRUPT 0xe
 #define GATE_EXCEPTION 0xf
+
+#define COUNTER (1193181 / 100)         // 100Hz
 
 /**
  * @brief 中断描述符
@@ -52,4 +57,20 @@ static void set_gate(unsigned char index, unsigned long addr, char type) {
     desc->dpl = 0;
     desc->type = type;
     desc->p = 1;
+}
+
+void interrupt_init(void) {
+    set_gate(0x20, (unsigned long)&timer_handler, GATE_INTERRUPT);       // 时钟中断
+}
+
+/**
+ * @brief 初始化时钟芯片8254
+ */
+void init_8254(void) {
+    // OCW
+    __asm__("outb %%al, $0x43" :: "a"(0x36));                   // "a"告诉编译器预先把值装载到 rax
+
+    // 100Hz
+    __asm__("outb %%al, $0x40" :: "a"(COUNTER & 0xff));
+    __asm__("outb %%al, $0x40" :: "a"(COUNTER >> 8));
 }

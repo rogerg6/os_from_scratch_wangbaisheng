@@ -1,6 +1,7 @@
 #include "include/mm.h"
 #include "include/sched.h"
 #include "include/tss.h"
+#include "include/interrupt.h"
 
 
 int main(void) {
@@ -10,8 +11,17 @@ int main(void) {
         "out %ax, %dx\n"
     );
     mm_init();
+
+    interrupt_init();
+
+    // enable interrupt
+    __asm__("sti");
+
     sched_init();
     tss_init();
+
+    // enable timer
+    init_8254();
 
     // unsigned long *x = VA(200 * 1024 * 1024);
     // *x = 5;

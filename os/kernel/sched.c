@@ -82,3 +82,7 @@ void sched_init(void) {
     make_task(1, 0x100000, 0xc800000);
     current = task_head;
 }
+
+void do_timer(void) {
+    print('T');
+}

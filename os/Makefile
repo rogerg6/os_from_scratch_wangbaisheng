@@ -27,8 +27,9 @@ include .depend
 
 OBJS = $(SRCS:.c=.o)
 
-system.bin: head64.o $(OBJS)
+system.bin: head64.o kernel/handler.o $(OBJS)
 	gcc -c head64.S -o head64.o 
+	gcc -c kernel/handler.S -o kernel/handler.o 
 	ld -Ttext=0xffffffff80100000 $^ -o system.elf
 	objcopy -O binary system.elf system.bin
 

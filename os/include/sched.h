@@ -16,3 +16,4 @@ extern struct task *current;
 
 
 void sched_init(void);
+void do_timer(void);

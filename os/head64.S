@@ -11,9 +11,8 @@ start64:
     mov $'L', %al
     out %al, %dx
 
-    lidt idtr
-
     lgdt gdtr
+    lidt idtr
 
     # 初始化段寄存器
     mov $KERNEL_DS, %ax
