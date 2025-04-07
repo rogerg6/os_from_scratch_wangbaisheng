@@ -5,11 +5,7 @@
 
 
 int main(void) {
-    __asm__(
-        "mov $0x3f8, %dx\n\t"
-        "mov $'M', %ax\n\t"
-        "out %ax, %dx\n"
-    );
+    print('M');
     mm_init();
 
     interrupt_init();

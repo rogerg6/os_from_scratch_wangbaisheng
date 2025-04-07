@@ -2,6 +2,7 @@
 .text
 .code64
 .globl timer_handler
+.globl pf_handler
 
 .macro SAVE_CONTEXT
     pushq %rdi
@@ -30,14 +31,21 @@
 timer_handler:
     SAVE_CONTEXT
 
-    mov $0x3f8, %dx
-    mov $'Z', %al
-    out %al, %dx
-
     mov $0x20, %al
     outb %al, $0x20         # 给8259A发送EOI
 
     call do_timer
+
+    RESTORE_CONTEXT
+
+    iretq
+
+pf_handler:
+    SAVE_CONTEXT
+
+    mov %cr2, %rdi
+    call do_page_fault
+    add $8, %rsp                # 跳过栈中的错误码
 
     RESTORE_CONTEXT
 

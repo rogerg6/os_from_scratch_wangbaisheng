@@ -1,4 +1,5 @@
 #include "include/mm.h"
+#include "include/sched.h"
 
 unsigned long mem_size = 0;         // 总的物理内存大小
 uint8_t pages[MAX_PAGES];           // 页状态 0-free, 1-used
@@ -74,4 +75,9 @@ void mm_init(void) {
 
     // 建立页表，映射所有的PA -> VA
     map_range(TASK0_PML4, (unsigned long)(VA(0)), 0, 0, (mem_size + PAGE_SIZE - 1) / PAGE_SIZE);
+}
+
+void do_page_fault(unsigned long addr) {
+    unsigned long pa = alloc_page();
+    map_range(current->pml4, addr, pa, 0x4, 1);
 }
