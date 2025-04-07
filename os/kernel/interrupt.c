@@ -28,7 +28,7 @@ struct gate_desc {
     uint16_t segment;
     uint16_t ist:3, zero:5, type:4, zero2:1, dpl:2, p:1;
     uint16_t offset_middle;
-    uint16_t offset_high;
+    uint32_t offset_high;
     
     uint32_t reserved;
 } __attribute__((packed));
@@ -52,7 +52,7 @@ static void set_gate(unsigned char index, unsigned long addr, char type) {
     desc->segment = KERNEL_CS;
     desc->offset_low = (uint16_t)addr;
     desc->offset_middle = (uint16_t)(addr >> 16);
-    desc->offset_high = (uint16_t)(addr >> 32);
+    desc->offset_high = (uint32_t)(addr >> 32);
     // desc->ist = ;               //中断不用中断栈，用进程内核栈
     desc->dpl = 0;
     desc->type = type;
