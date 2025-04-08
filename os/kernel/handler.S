@@ -45,8 +45,8 @@ pf_handler:
 
     mov %cr2, %rdi
     call do_page_fault
-    add $8, %rsp                # 跳过栈中的错误码
 
     RESTORE_CONTEXT
+    add $8, %rsp                # 跳过栈中的错误码
 
     iretq

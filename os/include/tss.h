@@ -37,6 +37,8 @@ struct tss_desc {
     uint32_t zero1;
 }__attribute__((packed));
 
+extern struct tss tss;
+
 
 void tss_init(void);
 

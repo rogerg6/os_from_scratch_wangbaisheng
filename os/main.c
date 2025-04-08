@@ -6,6 +6,7 @@
 
 int main(void) {
     print('M');
+    print('\n');
     mm_init();
 
     interrupt_init();

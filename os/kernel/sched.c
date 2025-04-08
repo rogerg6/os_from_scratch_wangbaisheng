@@ -3,10 +3,13 @@
 #include "include/mm.h"
 #include "include/string.h"
 #include "include/segment.h"
+#include "include/types.h"
+#include "include/tss.h"
 
 static struct task *task_head;
 static struct task *task_tail;
 struct task *current;
+struct task *idle_task;
 
 static void fake_task_stack(unsigned long kstack);
 
@@ -22,6 +25,7 @@ static void make_task(unsigned long id, unsigned long entry,
     /* 分配task */
     struct task *task = malloc(sizeof(struct task));
     task->id = id;
+    task->state = TASK_RUNNING;
 
     /* 地址映射 */
     task->pml4 = alloc_page();
@@ -31,10 +35,11 @@ static void make_task(unsigned long id, unsigned long entry,
 
     /* 分配内核栈 */
     task->kstack = (unsigned long)VA(alloc_page()) + PAGE_SIZE;
-    task->rsp0 = task->kstack - 8 * 5;
 
     /* 伪造中断现场 */
     fake_task_stack(task->kstack);
+    task->rsp0 = task->kstack - 8 * 5;
+    task->rip = (unsigned long)&ret_from_kernel;
 
     /* 放入进程链表 */
     if (!task_head) {
@@ -50,6 +55,16 @@ static void make_task(unsigned long id, unsigned long entry,
         task_tail = task;
     }
 
+}
+
+static void make_idle_task(void) {
+    idle_task = malloc(sizeof(struct task));
+    idle_task->id = 0;
+    idle_task->state = TASK_RUNNING;
+    idle_task->pml4 = TASK0_PML4;
+    idle_task->kstack = (unsigned long)&task0_stack;
+    idle_task->rsp0 = (unsigned long)&task0_stack;
+    idle_task->rip = (unsigned long)&idle_task_entry;
 }
 
 /**
@@ -80,9 +95,68 @@ static void fake_task_stack(unsigned long kstack) {
 
 void sched_init(void) {
     make_task(1, 0x100000, 0xc800000);
+    make_task(2, 0x100000, 0xd000000);
+    make_idle_task();
     current = task_head;
 }
 
+void schedule(void) {
+    struct task *next = NULL;
+
+    for (struct task *t = task_head; t; t = t->next){
+        if (t->state == TASK_RUNNING) {
+            next = t;
+            break;
+        }
+    }
+
+    if (!next)
+        next = idle_task;
+
+    // 切换任务
+    if (next != current) {
+        __asm__(                                            
+            // 保存当前任务rsp,rip
+            "mov %%rsp, %0\n\t"                             
+            "movq $1f, %1\n\t"                              
+
+            // 加载下个任务rsp,rip
+            "mov %2, %%rsp\n\t"                             
+            "push %3\n\t"                                   
+            : "=m"(current->rsp0), "=m"(current->rip)       
+            : "m"(next->rsp0), "m"(next->rip)               
+        );
+
+        tss.rsp0 = (unsigned long)next->kstack;
+        current = next;
+
+        __asm__("mov %0, %%cr3" : : "a"(next->pml4));
+        __asm__("ret");
+
+        __asm__("1:");
+    }
+    
+}
+
 void do_timer(void) {
-    print('T');
+    // print('T');
+    if (current != idle_task) {
+        if (current != task_tail) {
+            // 把当前任务移到队尾
+            if (current->prev) 
+                current->prev->next = current->next;
+            current->next->prev = current->prev;
+
+            current->prev = task_tail;
+            task_tail->next = current;
+
+            if (current == task_head)
+                task_head = current->next;
+            task_tail = current;
+
+            current->next = NULL;
+        }
+    }
+
+    schedule();
 }

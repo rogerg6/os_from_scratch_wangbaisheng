@@ -4,6 +4,8 @@
 .code64
 .globl gdt
 .globl ret_from_kernel
+.globl idle_task_entry
+.globl task0_stack
 
 start64:
     # 64位模式
@@ -61,3 +63,13 @@ ret_from_kernel:
     mov %ax, %fs
     mov %ax, %gs
     iretq                   # 弹出内核栈中的cs,ip,ss,rsp, 运行用户态程序
+
+idle_task_entry:
+1:
+    mov $0x3f8, %dx
+    mov $'S', %al
+    out %al, %dx
+
+    sti
+    hlt
+    jmp 1b
