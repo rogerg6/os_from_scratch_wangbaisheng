@@ -14,7 +14,7 @@ boot32.bin: boot32.S
 CFLAGS = -std=c11 -I. -fno-pic -mcmodel=kernel -fno-stack-protector -fcf-protection=none \
 	-nostdinc -fno-builtin
 
-SRCS = main.c $(wildcard mm/*.c) $(wildcard lib/*.c) $(wildcard sched/*.c) $(wildcard kernel/*.c)
+SRCS = main.c $(wildcard mm/*.c) $(wildcard lib/*.c) $(wildcard sched/*.c) $(wildcard kernel/*.c) $(wildcard ipc/*.c)
 
 # 创建源文件的依赖关系
 .depend: $(SRCS)
@@ -44,8 +44,8 @@ app/app1.bin: app/libc/start.o app/app1.o app/libc/libc.o
 	ld -Ttext=0x100000 $^ -o app/app1.elf
 	objcopy -O binary app/app1.elf $@
 
-app/app2.bin: app/app2.o
-	ld -Ttext=0x100000 $< -o app/app2.elf
+app/app2.bin: app/libc/start.o app/app2.o app/libc/libc.o
+	ld -Ttext=0x100000 $^ -o app/app2.elf
 	objcopy -O binary app/app2.elf $@
 
 build: build.c

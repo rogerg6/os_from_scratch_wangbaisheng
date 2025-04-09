@@ -13,9 +13,11 @@ extern void system_call(void);
 typedef unsigned long (*fn_ptr)(void);
 
 unsigned long do_sleep(unsigned long ms);
+int do_shm(char *name);
 
 fn_ptr syscall_table[] = {
-        do_sleep
+        do_sleep,
+        do_shm
 };
 
 void syscall_init(void) {
