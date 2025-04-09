@@ -66,9 +66,9 @@ ret_from_kernel:
 
 idle_task_entry:
 1:
-    mov $0x3f8, %dx
-    mov $'S', %al
-    out %al, %dx
+    #mov $0x3f8, %dx
+    #mov $'S', %al
+    #out %al, %dx
 
     sti
     hlt

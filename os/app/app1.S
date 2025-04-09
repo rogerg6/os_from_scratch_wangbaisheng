@@ -4,8 +4,13 @@
 
 1:
     mov $0x3f8, %dx
-    mov $'A', %ax
-    out %ax, %dx
+    mov $'A', %al
+    out %al, %dx
+
+    # syscall: sleep(1s)
+    mov $1000, %rdi
+    mov $0, %rax
+    syscall
 
 #    movb $'F', (0x12345678)
 #    mov (0x12345678), %al

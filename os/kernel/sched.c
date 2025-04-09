@@ -11,6 +11,10 @@ static struct task *task_tail;
 struct task *current;
 struct task *idle_task;
 
+unsigned long ticks;
+static struct timer *timer_head;
+static struct timer *timer_tail;
+
 static void fake_task_stack(unsigned long kstack);
 
 /**
@@ -140,6 +144,31 @@ void schedule(void) {
 
 void do_timer(void) {
     // print('T');
+    ticks++;
+    for (struct timer *t = timer_head; t; t = t->next) {
+        if (ticks >= t->alarm) {
+            // wakeup && schedule
+            t->task->state = TASK_RUNNING;
+
+            // reomve timer from timer list
+            if (timer_head == t && timer_tail == t) {
+                timer_head = NULL;
+                timer_tail = NULL;
+            } else if (timer_head == t) {
+                timer_head = t->next;
+                t->next->prev = NULL;
+            } else if (timer_tail == t) {
+                timer_tail = t->prev;
+                t->prev->next = NULL;
+            } else {
+                t->prev->next = t->next;
+                t->next->prev = t->prev;
+            }
+
+            free(t);
+        }
+    }
+
     if (current != idle_task) {
         if (current != task_tail) {
             // 把当前任务移到队尾
@@ -159,4 +188,29 @@ void do_timer(void) {
     }
 
     schedule();
+}
+
+/**
+ * SYSCALL
+ */
+unsigned long do_sleep(unsigned long ms) {
+    struct timer *t = malloc(sizeof(struct timer));
+    t->task = current;
+    t->alarm = ticks + ms / 10;
+
+    if (!timer_head) {
+        timer_head = t;
+        timer_tail = t;
+        t->prev = t->next = NULL;
+    } else {
+        timer_tail->next = t;
+        t->prev = timer_tail;
+        t->next = NULL;
+        timer_tail = t;
+    }
+
+    current->state = TASK_INTERRUPTIBLE;
+    schedule();
+
+    return 0;
 }

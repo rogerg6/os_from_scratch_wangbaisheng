@@ -17,6 +17,14 @@ struct task {
     struct task *next;
 };
 
+struct timer {
+    unsigned long alarm;
+    struct task *task;
+
+    struct timer *prev;
+    struct timer *next;
+};
+
 extern struct task *current;
 extern unsigned long task0_stack;
 extern unsigned long idle_task_entry;

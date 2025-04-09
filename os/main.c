@@ -2,6 +2,7 @@
 #include "include/sched.h"
 #include "include/tss.h"
 #include "include/interrupt.h"
+#include "include/syscall.h"
 
 
 int main(void) {
@@ -16,6 +17,7 @@ int main(void) {
 
     sched_init();
     tss_init();
+    syscall_init();
 
     // enable timer
     init_8254();
