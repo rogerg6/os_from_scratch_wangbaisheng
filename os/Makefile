@@ -33,13 +33,20 @@ system.bin: head64.o kernel/handler.o $(OBJS)
 	ld -Ttext=0xffffffff80100000 $^ -o system.elf
 	objcopy -O binary system.elf system.bin
 
-app/app1.bin: app/app1.o
-	ld -Ttext=0x100000 app/app1.o -o app/app1.elf
-	objcopy -O binary app/app1.elf app/app1.bin
+app/libc/libc.o: app/libc/syscall.o
+	# -r生成重定位目标文件
+	ld -r -o $@ $^
+
+app/app1.o: app/app1.c
+	gcc -I. -c -o $@ $<
+
+app/app1.bin: app/libc/start.o app/app1.o app/libc/libc.o
+	ld -Ttext=0x100000 $^ -o app/app1.elf
+	objcopy -O binary app/app1.elf $@
 
 app/app2.bin: app/app2.o
-	ld -Ttext=0x100000 app/app2.o -o app/app2.elf
-	objcopy -O binary app/app2.elf app/app2.bin
+	ld -Ttext=0x100000 $< -o app/app2.elf
+	objcopy -O binary app/app2.elf $@
 
 build: build.c
 	gcc $< -o $@
