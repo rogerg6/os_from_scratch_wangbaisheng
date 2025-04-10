@@ -1,4 +1,5 @@
 #include "include/types.h"
+#include "include/print.h"
 
 void* memset(void *s, int8_t c, uint32_t n) {
     char *tmp = s;

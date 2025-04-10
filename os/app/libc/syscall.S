@@ -8,6 +8,8 @@
 
 .globl sleep
 .globl shm_open
+.globl fbmap
+.globl get_mode_info
 
 sleep:
     mov $SYSCALL_SLEEP, %rax

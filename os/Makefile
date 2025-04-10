@@ -37,14 +37,22 @@ app/libc/libc.o: app/libc/syscall.o
 	# -r生成重定位目标文件
 	ld -r -o $@ $^
 
+# libdraw
+app/libdraw/draw.o: app/libdraw/draw.c
+	gcc -I. -c -o $@ $<
+app/libdraw/fonts.o: app/libdraw/fonts.c
+	gcc -I. -c -o $@ $<
+app/libdraw/libdraw.o: app/libdraw/draw.o app/libdraw/fonts.o
+	ld -r -o $@ $^
+
 app/app1.o: app/app1.c
 	gcc -I. -c -o $@ $<
 
-app/app1.bin: app/libc/start.o app/app1.o app/libc/libc.o
+app/app1.bin: app/libc/start.o app/app1.o app/libc/libc.o app/libdraw/libdraw.o
 	ld -Ttext=0x100000 $^ -o app/app1.elf
 	objcopy -O binary app/app1.elf $@
 
-app/app2.bin: app/libc/start.o app/app2.o app/libc/libc.o
+app/app2.bin: app/libc/start.o app/app2.o app/libc/libc.o app/libdraw/libdraw.o
 	ld -Ttext=0x100000 $^ -o app/app2.elf
 	objcopy -O binary app/app2.elf $@
 
@@ -61,4 +69,4 @@ clean:
 	rm -f build .depend
 
 run:
-	../kvmtool/lkvm run -c 1 -k kernel.bin
+	../kvmtool/lkvm run --sdl -c 1 -k kernel.bin

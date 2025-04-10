@@ -1,5 +1,6 @@
 #include "include/types.h"
 
+#pragma once
 struct vesa_mode_info {
     uint8_t pad0[18];
     uint16_t hres;          // horizonal resolution

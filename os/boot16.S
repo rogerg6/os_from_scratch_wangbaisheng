@@ -75,3 +75,5 @@ e820_entry:
 .org 0x4000
 vesa_mode_info:
     .fill 256, 1, 0
+.align 512, 0
+.org 0x4200

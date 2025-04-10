@@ -8,6 +8,7 @@ struct vesa_mode_info *vesa_mode_info;
 void vesa_init(void) {
     vesa_mode_info = malloc(sizeof(vesa_mode_info));
     memcpy(vesa_mode_info, (char*)0x14000, sizeof(struct vesa_mode_info));
+    print('z');
 }
 
 /**

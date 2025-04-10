@@ -10,16 +10,13 @@ int main(void) {
     print('\n');
     mm_init();
 
+    syscall_init();
     vesa_init();
 
     interrupt_init();
 
-    // enable interrupt
-    __asm__("sti");
-
     sched_init();
     tss_init();
-    syscall_init();
 
     // enable timer
     init_8254();
@@ -30,6 +27,9 @@ int main(void) {
 
     /* 设置cr3指向进程页表 */
     __asm__("mov %0, %%cr3" : :"r"(current->pml4));
+
+    // enable interrupt
+    __asm__("sti");
 
     /* 跳转到用户空间 */
     __asm__(
