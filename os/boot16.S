@@ -22,6 +22,11 @@ e820_read_entry:
     cmp $0, %ebx
     jne e820_read_entry
 
+    # 读取vesa info
+    mov $vesa_mode_info, %di
+    mov $0x4f01, %ax
+    int $0x10
+
     # 初始化8259A中断芯片
     # ICW1
     mov $0x13, %al
@@ -66,3 +71,7 @@ e820_nr_entry:
     .long 0
 e820_entry:
     .fill 1024, 1, 0
+
+.org 0x4000
+vesa_mode_info:
+    .fill 256, 1, 0

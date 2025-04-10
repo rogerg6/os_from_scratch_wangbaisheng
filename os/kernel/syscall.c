@@ -2,6 +2,7 @@
 #include "include/segment.h"
 #include "include/types.h"
 #include "include/print.h"
+#include "include/vesa.h"
 
 #define MSR_STAR            0xc0000081
 #define MSR_LSTAR           0xc0000082
@@ -14,10 +15,14 @@ typedef unsigned long (*fn_ptr)(void);
 
 unsigned long do_sleep(unsigned long ms);
 int do_shm(char *name);
+unsigned long do_fbmap(void);
+int do_get_mode_info(struct mode_info *mode_info);
 
 fn_ptr syscall_table[] = {
         do_sleep,
-        do_shm
+        do_shm,
+        do_fbmap,
+        do_get_mode_info
 };
 
 void syscall_init(void) {

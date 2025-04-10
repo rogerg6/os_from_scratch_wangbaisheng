@@ -14,7 +14,7 @@ boot32.bin: boot32.S
 CFLAGS = -std=c11 -I. -fno-pic -mcmodel=kernel -fno-stack-protector -fcf-protection=none \
 	-nostdinc -fno-builtin
 
-SRCS = main.c $(wildcard mm/*.c) $(wildcard lib/*.c) $(wildcard sched/*.c) $(wildcard kernel/*.c) $(wildcard ipc/*.c)
+SRCS = main.c $(wildcard mm/*.c) $(wildcard lib/*.c) $(wildcard sched/*.c) $(wildcard kernel/*.c) $(wildcard ipc/*.c) $(wildcard drivers/*.c)
 
 # 创建源文件的依赖关系
 .depend: $(SRCS)

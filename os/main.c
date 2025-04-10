@@ -3,12 +3,14 @@
 #include "include/tss.h"
 #include "include/interrupt.h"
 #include "include/syscall.h"
-
+#include "include/vesa.h"
 
 int main(void) {
     print('M');
     print('\n');
     mm_init();
+
+    vesa_init();
 
     interrupt_init();
 
