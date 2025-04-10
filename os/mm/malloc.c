@@ -72,7 +72,7 @@ void *malloc(int size) {
 }
 
 void free(void *obj) {
-    unsigned long page = (unsigned long)obj & 0xfffff000;       // why not 0xffff ffff fff0 ??
+    unsigned long page = (unsigned long)obj & ~0xfff;
     struct bucket_dir *bdir = bucket_dir;
     struct bucket_desc *bdesc = NULL;
 
@@ -84,11 +84,12 @@ void free(void *obj) {
                 *((unsigned long*)obj) = (unsigned long)bdesc->freeptr;
                 bdesc->freeptr = obj;
                 bdesc->refcnt--;
-                break;
+                goto free_page;
             }
         }
     }
 
+free_page:
     // free bdesc
     if (bdesc && bdesc->refcnt == 0) {
         struct bucket_desc *tmp = bdir->bdesc;
@@ -104,6 +105,6 @@ void free(void *obj) {
         else 
             prev->next = tmp->next;
 
-        free_page((unsigned long)bdesc);
+        free_page(PA(bdesc));
     }
 }

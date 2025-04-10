@@ -8,7 +8,8 @@
 #define KERNEL_PAGE_NUM (16 * 1024)         // 内核使用的物理页数 64M = 16 * 1024 * 4K
 
 #define TASK0_PML4 0x30000                  // 根页表物理地址
-#define VA(pa)  ((void*)((unsigned long)(pa) + 0xffff888000000000))   
+#define VA(x)  ((void*)((unsigned long)(x) + 0xffff888000000000))   
+#define PA(x)  ((unsigned long)(x) - 0xffff888000000000)   
 
 struct e820entry {
     uint64_t addr;
