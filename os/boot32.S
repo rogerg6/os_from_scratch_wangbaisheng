@@ -40,7 +40,7 @@ start32:
     stosl                       # (es:edi)=eax； edi+=4
     add $0x1000, %eax
     add $4, %edi
-    cmp $(0x32000 + 512 * 32 * 8), %edi
+    cmp $(0x33000 + 512 * 32 * 8), %edi
     jl 2b
 
     # 建立临时2级页表映射
@@ -50,7 +50,7 @@ start32:
     stosl                       # (es:edi)=eax； edi+=4
     add $0x1000, %eax
     add $4, %edi
-    cmp $(0x56000 + 512 * 32 * 8), %edi
+    cmp $(0x56000 + 32 * 8), %edi
     jl 3b
 
     ##### 切换到64位模式 #####
