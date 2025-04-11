@@ -62,6 +62,7 @@ static void set_gate(unsigned char index, unsigned long addr, char type) {
 void interrupt_init(void) {
     set_gate(0x0e, (unsigned long)&pf_handler, GATE_EXCEPTION);          // 缺页异常
     set_gate(0x20, (unsigned long)&timer_handler, GATE_INTERRUPT);       // 时钟中断
+    set_gate(0x21, (unsigned long)&kb_handler, GATE_INTERRUPT);          // 键盘中断
 }
 
 /**

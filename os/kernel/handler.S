@@ -4,6 +4,7 @@
 .globl timer_handler
 .globl pf_handler
 .globl system_call
+.globl kb_handler
 
 # 有参宏
 .macro SAVE_CONTEXT save_rax=1
@@ -70,3 +71,16 @@ pf_handler:
     add $8, %rsp                # 跳过栈中的错误码
 
     iretq
+
+kb_handler:
+    SAVE_CONTEXT
+
+    mov $0x20, %al
+    outb %al, $0x20         # 给8259A发送EOI
+
+    call process_kb
+
+    RESTORE_CONTEXT
+
+    iretq
+
