@@ -30,7 +30,7 @@ void draw_char_zh(int o_x, int o_y, int index, int color,
             }
         }
 
-        c1 = fonts_zh[index][y * 2];
+        c1 = fonts_zh[index][y * 2 + 1];
         for (int x = 0; x < 8; x++) {
             char bit = (c1 >> (7 - x)) & 0x1;
             if (bit == 1) {

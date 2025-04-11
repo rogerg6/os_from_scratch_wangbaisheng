@@ -31,6 +31,7 @@ int main(void) {
             draw_char(fbbase, &minfo, RED | GREEN);
         else
             draw_char(fbbase, &minfo, RED | BLUE);
+        i++;
 
         print(*(char*)m);
         sleep(1000);
